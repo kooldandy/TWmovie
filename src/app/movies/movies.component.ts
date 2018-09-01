@@ -154,11 +154,24 @@ export class MoviesComponent implements OnInit {
         const tempArr = [];
         this._dataListArr.forEach((m: string) => {
             if ((m.toLowerCase().indexOf(text)) > -1) {
-                tempArr.push(m);
+                tempArr.push({name: m, index: m.toLowerCase().indexOf(text)});
             }
         });
-        this._dataListArr.sort();
-        this.dataListArr = (tempArr.length < 10) ? tempArr : tempArr.splice(0, 10);
+
+        tempArr.sort((a: any, b: any) => {
+            return (a.index - b.index);
+        });
+        tempArr.forEach((a: any, b: any) => {
+            return (a.index - b.index);
+        });
+
+        this.dataListArr = (tempArr.length > 0 ) ? [] : this.dataListArr;
+        for (const item of tempArr) {
+            this.dataListArr.push(item.name);
+            if (this.dataListArr.length === 10) {
+                break;
+            }
+        }
     }
 }
 
