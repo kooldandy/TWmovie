@@ -24,7 +24,7 @@ interface Movies {
 })
 
 
-export class MoviesComponent implements OnInit, AfterViewInit {
+export class MoviesComponent implements OnInit {
     static FULLMOVIES;
     @ViewChild('moviename') seachInput: ElementRef;
     private url: any;
@@ -34,7 +34,7 @@ export class MoviesComponent implements OnInit, AfterViewInit {
     _movieLangArr;
     isAutoComp: boolean;
     dataListArr;
-    isLoading: boolean = true;
+    isLoading: boolean;
 
     constructor(private bkSvc: BackendService) {
         this.url = 'http://starlord.hackerearth.com/movieslisting';
@@ -44,6 +44,7 @@ export class MoviesComponent implements OnInit, AfterViewInit {
         this.isAutoComp = false;
         this._dataListArr = [];
         this.dataListArr = [];
+        this.isLoading = true;
     }
 
     ngOnInit() {
@@ -59,6 +60,9 @@ export class MoviesComponent implements OnInit, AfterViewInit {
                         this._movieLangArr.push(m.language);
                     }
                     this._dataListArr.push(m.movie_title.trim());
+                });
+                this._movieYearsArr = this._movieYearsArr.sort((a, b) => {
+                    return a - b;
                 });
                 this.isLoading = false;
             },
@@ -79,22 +83,29 @@ export class MoviesComponent implements OnInit, AfterViewInit {
             });
     }
 
-
-    filter(val, name: any) {
+    filter() {
         this.isLoading = true;
-        if (val === null || val.trim() === '') {
-            this.moviesArray = JSON.parse(JSON.stringify(MoviesComponent.FULLMOVIES));
-            this.isLoading = false;
-            return;
-        }
-        this.moviesArray = this.moviesArray.filter((m: Movies) => {
-            if (name === 'lang') {
-                return (m.language === val);
+        let arr: Array<any> = [];
+        const filterYr = (<any>document.querySelector('#filteryr')).options[(<any>document.querySelector('#filteryr')).selectedIndex].value.trim().toLowerCase();;
+        const filterLang = (<any>document.querySelector('#filterlang')).options[(<any>document.querySelector('#filterlang')).selectedIndex].value.trim().toLowerCase();;
+
+        (<any>document.querySelector('#sortingrat')).innerHTML = '↑';
+        (<any>document.querySelector('#sortingyr')).innerHTML = '↑';
+
+        this.moviesArray = JSON.parse(JSON.stringify(MoviesComponent.FULLMOVIES));
+
+        arr = this.moviesArray.filter((m: Movies) => {
+            if (filterYr !== '' && filterLang !== '') {
+                return (m.language.toLowerCase() === filterLang && m.title_year === filterYr);
             }
-            if (name === 'year') {
-                return (m.title_year === val);
+            else if (filterLang !== '') {
+                return (m.language.toLowerCase() === filterLang);
+            }
+            else if (filterYr !== '') {
+                return (m.title_year === filterYr);
             }
         });
+        this.moviesArray = arr;
         this.isLoading = false;
     }
 
@@ -113,25 +124,21 @@ export class MoviesComponent implements OnInit, AfterViewInit {
         this.isLoading = false;
     }
 
-    private typeAhead(text: any) {
-        let tempArr = [];
-        this._dataListArr.forEach((m: string) => {
-            if ((m.toLowerCase().indexOf(text)) > -1) {
-                tempArr.push(m);
-            }
-        });
-        this.dataListArr = (tempArr.length < 10) ? tempArr : tempArr.splice(0, 10);
-    }
     search(movietile) {
         this.isLoading = true;
-        movietile  = movietile.value;
+        movietile = movietile.value;
         if (movietile.trim() === '') {
             this.isLoading = false;
             return;
         }
+        this.moviesArray = JSON.parse(JSON.stringify(MoviesComponent.FULLMOVIES));
         this.moviesArray = this.moviesArray.filter((m: Movies) => {
             return (m.movie_title.trim().toLowerCase() === movietile.trim().toLowerCase());
         });
+        (<any>document.querySelector('#filteryr')).options[0].selected = 'selected';
+        (<any>document.querySelector('#filterlang')).options[0].selected = 'selected';
+        (<any>document.querySelector('#sortingrat')).innerHTML = '↑';
+        (<any>document.querySelector('#sortingyr')).innerHTML = '↑';
         this.isLoading = false;
     }
     reset() {
@@ -142,7 +149,16 @@ export class MoviesComponent implements OnInit, AfterViewInit {
         (<any>document.querySelector('#filterlang')).options[0].selected = 'selected';
         return;
     }
-    ngAfterViewInit() {
+
+    private typeAhead(text: any) {
+        const tempArr = [];
+        this._dataListArr.forEach((m: string) => {
+            if ((m.toLowerCase().indexOf(text)) > -1) {
+                tempArr.push(m);
+            }
+        });
+        this._dataListArr.sort();
+        this.dataListArr = (tempArr.length < 10) ? tempArr : tempArr.splice(0, 10);
     }
 }
 

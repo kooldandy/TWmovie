@@ -16,24 +16,24 @@
             <h4>Sort By:</h4>
             <div>
                 <span>Rating</span>
-                <button class="btn btn-link" (click)="sorting($event, 'rating')">&uarr;</button>
+                <button id="sortingrat" class="btn btn-link" (click)="sorting($event, 'rating')">&uarr;</button>
             </div>
             <br/>
             <div>
                 <span>Year</span>
-                <button class="btn btn-link" (click)="sorting($event, 'year')">&uarr;</button>
+                <button id="sortingyr" class="btn btn-link" (click)="sorting($event, 'year')">&uarr;</button>
             </div>
 
         </form>
         <form class="filter-form form-group">
             <h4>Filter:</h4>
             <span>Year:</span>
-            <select id="filteryr" class="form-control" (change)="filter($event.target.value, 'year')">
+            <select id="filteryr" class="form-control" (change)="filter()">
                 <option *ngFor="let y of _movieYearsArr" value={{y}}>{{y}}</option>
             </select>
             <br/>
             <span>Language:</span>
-            <select id="filterlang" class="form-control" (change)="filter($event.target.value, 'lang')">
+            <select id="filterlang" class="form-control" (change)="filter()">
                 <option *ngFor="let l of _movieLangArr" value={{l}}>{{l}}</option>
             </select>
         </form>
