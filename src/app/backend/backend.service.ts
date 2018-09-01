@@ -25,7 +25,7 @@ export class BackendService {
   getData(url: any): Observable<Movies> {
     return this.http.get<Movies>(url)
     .pipe(
-        map((res: HttpResponse) => res)
+        map((res: any) => res)
     );
   }
 }
